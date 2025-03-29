@@ -1,8 +1,7 @@
 package main
 
 import (
-	"go-check-err-before-use/pkg/analyzer"
-
+	"github.com/T-Sh/go-check-err-before-use/pkg/analyzer"
 	"golang.org/x/tools/go/analysis/singlechecker"
 )
 
