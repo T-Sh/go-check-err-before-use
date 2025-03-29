@@ -46,7 +46,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	},
 	)
 
-	return nil, nil
+	return nil, nil //nolint:nilnil
 }
 
 func isAssignWithErr(node ast.Node) bool {
@@ -66,16 +66,18 @@ func isAssignWithErr(node ast.Node) bool {
 
 func isIfWithErr(node ast.Node) bool {
 	ifStmt, ok := node.(*ast.IfStmt)
-	if ok {
+	if ok { //nolint:nestif
 		if binExpr, ok := ifStmt.Cond.(*ast.BinaryExpr); ok {
 			if isExpContainsErr(binExpr.X) {
 				return true
 			}
+
 			if Xbin, ok := binExpr.X.(*ast.BinaryExpr); ok {
 				if isExpContainsErr(Xbin.X) {
 					return true
 				}
 			}
+
 			if Ybin, ok := binExpr.Y.(*ast.BinaryExpr); ok {
 				if isExpContainsErr(Ybin.X) {
 					return true
@@ -152,7 +154,6 @@ func isSwitchWithBody(switchStmt *ast.SwitchStmt) bool {
 				return isIfWithErr(expr) || isExpContainsErr(expr)
 			}
 		}
-
 	}
 
 	return false
@@ -160,7 +161,7 @@ func isSwitchWithBody(switchStmt *ast.SwitchStmt) bool {
 
 func isAssignWithErrUse(node ast.Node) bool {
 	assignStmt, ok := node.(*ast.AssignStmt)
-	if ok {
+	if ok { //nolint:nestif
 		for _, stmt := range assignStmt.Rhs {
 			if right, ok := stmt.(*ast.CompositeLit); ok {
 				for _, elt := range right.Elts {
