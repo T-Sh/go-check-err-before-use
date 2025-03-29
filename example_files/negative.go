@@ -3,6 +3,9 @@ package src
 import (
 	"fmt"
 	"log/syslog"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func insideFor() {
@@ -45,10 +48,6 @@ func wrong() {
 	}
 }
 
-func noValues() {
-	_, _ = with2Values()
-}
-
 func errName() {
 	res, errVal := with2Values()
 
@@ -82,4 +81,11 @@ func with2Values() (int, error) {
 
 func with3Values() (int, string, error) {
 	return 0, "", nil
+}
+
+func wrongTest(t *testing.T) {
+	v, err := with2Values()
+
+	require.Equal(t, v, "")
+	require.ErrorIs(t, nil, err)
 }
