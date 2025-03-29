@@ -1,4 +1,4 @@
-# Desc
+# Description
 
 Custom linter to check err before struct usage
 
@@ -12,7 +12,7 @@ Negative cases must be commented by linter.
 
 # Run as linter
 
-Install linter:
+Install local linter:
 
 `go install ./cmd/...`
 
