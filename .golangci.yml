@@ -1,27 +1,19 @@
 ---
-version: '2'
+version: "2"
 
 run:
   timeout: 3m
-  skip-dirs:
-    - example_files
 
 linters:
-  presets:
-    - bugs
-    - comment
-    - complexity
-    - error
-    - format
-    - import
-    - metalinter
-    - module
-    - performance
-    - style
-    - test
-    - unused
   disable:
     - depguard
     - forcetypeassert
     - exhaustruct
     - gochecknoglobals
+  exclusions:
+    paths:
+      - example_files/positive.go
+      - example_files/negative.go
+    paths-except:
+      - example_files/positive.go
+      - example_files/negative.go
