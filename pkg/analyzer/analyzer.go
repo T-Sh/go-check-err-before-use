@@ -55,9 +55,14 @@ func checkValueNameWithErr(name string) bool {
 
 // Checks that assigment contains err in return values.
 // Example: v, err := someFunc()
+// Skips single err return.
+// Example for skip:  err := someFunc()
 func isAssignWithErr(node ast.Node) bool {
-	assignStmt, ok := node.(*ast.AssignStmt)
-	if ok {
+	if assignStmt, ok := node.(*ast.AssignStmt); ok {
+		if len(assignStmt.Lhs) == 1 {
+			return false
+		}
+
 		for _, expr := range assignStmt.Lhs {
 			if ident, ok := expr.(*ast.Ident); ok {
 				if checkValueNameWithErr(ident.Name) {

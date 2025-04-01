@@ -81,3 +81,17 @@ func errInStruct() ErrStruct {
 
 	return e
 }
+
+func SingleErrReturn() error {
+	return nil
+}
+
+func singleErr() {
+	err := SingleErrReturn()
+
+	print()
+
+	if err != nil {
+
+	}
+}
