@@ -2,7 +2,6 @@ package analyzer
 
 import (
 	"go/ast"
-	"strings"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
@@ -51,7 +50,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 }
 
 func checkValueNameWithErr(name string) bool {
-	return strings.HasPrefix(name, errPrefix) || strings.HasSuffix(name, errPrefix)
+	return name == errPrefix
 }
 
 // Checks that assigment contains err in return values.
