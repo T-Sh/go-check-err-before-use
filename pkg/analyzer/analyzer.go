@@ -2,6 +2,7 @@ package analyzer
 
 import (
 	"go/ast"
+	"strings"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
@@ -49,12 +50,16 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	return nil, nil //nolint:nilnil
 }
 
+func checkValueNameWithErr(name string) bool {
+	return strings.HasPrefix(name, errPrefix) || strings.HasSuffix(name, errPrefix)
+}
+
 func isAssignWithErr(node ast.Node) bool {
 	assignStmt, ok := node.(*ast.AssignStmt)
 	if ok {
 		for _, expr := range assignStmt.Lhs {
 			if ident, ok := expr.(*ast.Ident); ok {
-				if ident.Name == errPrefix {
+				if checkValueNameWithErr(ident.Name) {
 					return true
 				}
 			}
@@ -95,7 +100,7 @@ func isIfWithErr(node ast.Node) bool {
 
 func isExpContainsErr(expr ast.Expr) bool {
 	if X, ok := expr.(*ast.Ident); ok {
-		if X.Name == errPrefix {
+		if checkValueNameWithErr(X.Name) {
 			return true
 		}
 	}
@@ -110,7 +115,7 @@ func isExpContainsErr(expr ast.Expr) bool {
 func isExprContainsErrInCall(expr *ast.CallExpr) bool {
 	for _, arg := range expr.Args {
 		if ident, ok := arg.(*ast.Ident); ok {
-			if ident.Name == errPrefix {
+			if checkValueNameWithErr(ident.Name) {
 				return true
 			}
 		}
@@ -139,7 +144,7 @@ func isSwitch(node ast.Node) bool {
 
 func isSwitchWithTag(switchStmt *ast.SwitchStmt) bool {
 	if ident, ok := switchStmt.Tag.(*ast.Ident); ok {
-		if ident.Name == errPrefix {
+		if checkValueNameWithErr(ident.Name) {
 			return true
 		}
 	}
@@ -167,7 +172,7 @@ func isAssignWithErrUse(node ast.Node) bool {
 				for _, elt := range right.Elts {
 					if expr, ok := elt.(*ast.KeyValueExpr); ok {
 						if ident, ok := expr.Value.(*ast.Ident); ok {
-							if ident.Name == errPrefix {
+							if checkValueNameWithErr(ident.Name) {
 								return true
 							}
 						}
