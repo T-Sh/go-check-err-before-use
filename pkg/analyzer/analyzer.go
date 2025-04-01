@@ -54,6 +54,8 @@ func checkValueNameWithErr(name string) bool {
 	return strings.HasPrefix(name, errPrefix) || strings.HasSuffix(name, errPrefix)
 }
 
+// Checks that assigment contains err in return values.
+// Example: v, err := someFunc()
 func isAssignWithErr(node ast.Node) bool {
 	assignStmt, ok := node.(*ast.AssignStmt)
 	if ok {
@@ -69,6 +71,9 @@ func isAssignWithErr(node ast.Node) bool {
 	return false
 }
 
+// Checks that if statement contains err check inside.
+// Example: if err != nil ...
+// Example: if IsError(err) ...
 func isIfWithErr(node ast.Node) bool {
 	ifStmt, ok := node.(*ast.IfStmt)
 	if ok { //nolint:nestif
@@ -98,6 +103,8 @@ func isIfWithErr(node ast.Node) bool {
 	return false
 }
 
+// Checks that if inside contains err usage.
+// Example: err != nil ...
 func isExpContainsErr(expr ast.Expr) bool {
 	if X, ok := expr.(*ast.Ident); ok {
 		if checkValueNameWithErr(X.Name) {
@@ -112,6 +119,8 @@ func isExpContainsErr(expr ast.Expr) bool {
 	return false
 }
 
+// Checks that func call uses err inside.
+// Example: IsError(err) ...
 func isExprContainsErrInCall(expr *ast.CallExpr) bool {
 	for _, arg := range expr.Args {
 		if ident, ok := arg.(*ast.Ident); ok {
@@ -124,6 +133,8 @@ func isExprContainsErrInCall(expr *ast.CallExpr) bool {
 	return false
 }
 
+// Checks that func call uses err inside.
+// Example: checkError(err)
 func isCallWithErr(node ast.Node) bool {
 	if exprStmt, ok := node.(*ast.ExprStmt); ok {
 		if X, ok := exprStmt.X.(*ast.CallExpr); ok {
@@ -134,6 +145,9 @@ func isCallWithErr(node ast.Node) bool {
 	return false
 }
 
+// Checks that switch uses err variable.
+// Example: switch err {...
+// Example: switch { err != nil {...
 func isSwitch(node ast.Node) bool {
 	if switchStmt, ok := node.(*ast.SwitchStmt); ok {
 		return isSwitchWithTag(switchStmt) || isSwitchWithBody(switchStmt)
@@ -142,6 +156,8 @@ func isSwitch(node ast.Node) bool {
 	return false
 }
 
+// Checks that switch uses err variable in tag.
+// Example: switch err {...
 func isSwitchWithTag(switchStmt *ast.SwitchStmt) bool {
 	if ident, ok := switchStmt.Tag.(*ast.Ident); ok {
 		if checkValueNameWithErr(ident.Name) {
@@ -152,6 +168,8 @@ func isSwitchWithTag(switchStmt *ast.SwitchStmt) bool {
 	return false
 }
 
+// Checks that switch uses err variable in body.
+// Example: switch { err != nil {...
 func isSwitchWithBody(switchStmt *ast.SwitchStmt) bool {
 	for _, caseClauseStmt := range switchStmt.Body.List {
 		if caseClause, ok := caseClauseStmt.(*ast.CaseClause); ok {
@@ -164,6 +182,8 @@ func isSwitchWithBody(switchStmt *ast.SwitchStmt) bool {
 	return false
 }
 
+// Checks that assigment uses err in func call.
+// Example: res := errCheck(err)
 func isAssignWithErrUse(node ast.Node) bool {
 	assignStmt, ok := node.(*ast.AssignStmt)
 	if ok { //nolint:nestif
