@@ -18,7 +18,7 @@ func TestPositive(t *testing.T) {
 	}
 
 	testdata := filepath.Join(filepath.Dir(filepath.Dir(wd)), "testdata")
-	analysistest.Run(t, testdata, analyzer.Analyzer, "positive")
+	analysistest.Run(t, testdata, analyzer.NewAnalyzer(nil), "positive")
 }
 
 func TestNegative(t *testing.T) {
@@ -31,5 +31,5 @@ func TestNegative(t *testing.T) {
 	}
 
 	testdata := filepath.Join(filepath.Dir(filepath.Dir(wd)), "testdata")
-	analysistest.Run(t, testdata, analyzer.Analyzer, "negative")
+	analysistest.Run(t, testdata, analyzer.NewAnalyzer(nil), "negative")
 }
