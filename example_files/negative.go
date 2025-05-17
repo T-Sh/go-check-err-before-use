@@ -49,7 +49,7 @@ func wrong() {
 }
 
 func errName() {
-	res, errVal := with2Values()
+	res, errVal := returns2Values()
 
 	print(res)
 
@@ -58,7 +58,7 @@ func errName() {
 }
 
 func wrongCustom2Func() {
-	res, err := with2Values()
+	res, err := returns2Values()
 
 	print(res)
 
@@ -67,7 +67,7 @@ func wrongCustom2Func() {
 }
 
 func wrongCustom3Func() {
-	res, str, err := with3Values()
+	res, str, err := returns3Values()
 
 	print(res, str)
 
@@ -75,16 +75,17 @@ func wrongCustom3Func() {
 	}
 }
 
-func with2Values() (int, error) {
-	return 0, nil
-}
+func wrongWithOk() {
+	_, ok := returnsBool()
+	print()
 
-func with3Values() (int, string, error) {
-	return 0, "", nil
+	if !ok {
+		return
+	}
 }
 
 func wrongTest(t *testing.T) {
-	v, err := with2Values()
+	v, err := returns2Values()
 
 	require.Equal(t, v, "")
 	require.ErrorIs(t, nil, err)

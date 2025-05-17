@@ -2,10 +2,13 @@ package analyzer
 
 import "go/ast"
 
-const errPrefix = "err"
+const (
+	errPrefix = "err"
+	okPrefix  = "ok"
+)
 
 func checkValueNameWithErr(name string) bool {
-	return name == errPrefix
+	return name == errPrefix || name == okPrefix
 }
 
 // Checks that assigment contains err in return values.
@@ -35,28 +38,30 @@ func isAssignWithErr(node ast.Node) bool {
 // Example: if IsError(err) ...
 func isIfWithErr(node ast.Node) bool {
 	ifStmt, ok := node.(*ast.IfStmt)
-	if ok { //nolint:nestif
-		if binExpr, ok := ifStmt.Cond.(*ast.BinaryExpr); ok {
-			if isExpContainsErr(binExpr.X) {
+	if !ok {
+		return false
+	}
+
+	if binExpr, ok := ifStmt.Cond.(*ast.BinaryExpr); ok {
+		if isExpContainsErr(binExpr.X) {
+			return true
+		}
+
+		if Xbin, ok := binExpr.X.(*ast.BinaryExpr); ok {
+			if isExpContainsErr(Xbin.X) {
 				return true
 			}
-
-			if Xbin, ok := binExpr.X.(*ast.BinaryExpr); ok {
-				if isExpContainsErr(Xbin.X) {
-					return true
-				}
-			}
-
-			if Ybin, ok := binExpr.Y.(*ast.BinaryExpr); ok {
-				if isExpContainsErr(Ybin.X) {
-					return true
-				}
-			}
 		}
 
-		if callExpr, ok := ifStmt.Cond.(*ast.CallExpr); ok {
-			return isExprContainsErrInCall(callExpr)
+		if Ybin, ok := binExpr.Y.(*ast.BinaryExpr); ok {
+			if isExpContainsErr(Ybin.X) {
+				return true
+			}
 		}
+	}
+
+	if isExpContainsErr(ifStmt.Cond) {
+		return true
 	}
 
 	return false
@@ -67,6 +72,12 @@ func isIfWithErr(node ast.Node) bool {
 func isExpContainsErr(expr ast.Expr) bool {
 	if X, ok := expr.(*ast.Ident); ok {
 		if checkValueNameWithErr(X.Name) {
+			return true
+		}
+	}
+
+	if unaryExp, ok := expr.(*ast.UnaryExpr); ok {
+		if isExpContainsErr(unaryExp.X) {
 			return true
 		}
 	}
@@ -145,15 +156,17 @@ func isSwitchWithBody(switchStmt *ast.SwitchStmt) bool {
 // Example: res := errCheck(err)
 func isAssignWithErrUse(node ast.Node) bool {
 	assignStmt, ok := node.(*ast.AssignStmt)
-	if ok { //nolint:nestif
-		for _, stmt := range assignStmt.Rhs {
-			if right, ok := stmt.(*ast.CompositeLit); ok {
-				for _, elt := range right.Elts {
-					if expr, ok := elt.(*ast.KeyValueExpr); ok {
-						if ident, ok := expr.Value.(*ast.Ident); ok {
-							if checkValueNameWithErr(ident.Name) {
-								return true
-							}
+	if !ok {
+		return false
+	}
+
+	for _, stmt := range assignStmt.Rhs {
+		if right, ok := stmt.(*ast.CompositeLit); ok {
+			for _, elt := range right.Elts {
+				if expr, ok := elt.(*ast.KeyValueExpr); ok {
+					if ident, ok := expr.Value.(*ast.Ident); ok {
+						if checkValueNameWithErr(ident.Name) {
+							return true
 						}
 					}
 				}

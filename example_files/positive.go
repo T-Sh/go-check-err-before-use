@@ -37,18 +37,18 @@ func skippedErr() {
 }
 
 func noValues() {
-	_, _ = with2Values()
+	_, _ = returns2Values()
 }
 
 func rightTest(t *testing.T) {
-	v, err := with2Values()
+	v, err := returns2Values()
 
 	require.ErrorIs(t, nil, err)
 	require.Equal(t, v, "")
 }
 
 func withSwitchExpr() {
-	_, err := with2Values()
+	_, err := returns2Values()
 
 	switch err {
 	case nil:
@@ -57,7 +57,7 @@ func withSwitchExpr() {
 }
 
 func withSwitch() {
-	_, err := with2Values()
+	_, err := returns2Values()
 
 	switch {
 	case errors.Is(err, nil):
@@ -75,7 +75,7 @@ type ErrStruct struct {
 }
 
 func errInStruct() ErrStruct {
-	_, err := with2Values()
+	_, err := returns2Values()
 
 	e := ErrStruct{field1: 0, field2: err}
 
@@ -94,4 +94,23 @@ func singleErr() {
 	if err != nil {
 
 	}
+}
+
+func withOk() {
+	_, ok := returnsBool()
+	if ok {
+		return
+	}
+}
+
+func errWithOk() {
+	var errCh = make(chan error)
+	close(errCh)
+
+	err, ok := <-errCh
+	if !ok { // linter triggers on this
+		return
+	}
+
+	panic(err.Error())
 }
