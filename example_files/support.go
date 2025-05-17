@@ -11,3 +11,12 @@ func returns3Values() (int, string, error) {
 func returnsBool() (int, bool) {
 	return 0, true
 }
+
+func SingleErrReturn() error {
+	return nil
+}
+
+type ErrStruct struct {
+	field1 int
+	field2 error
+}

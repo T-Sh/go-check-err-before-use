@@ -69,21 +69,12 @@ func withSwitch() {
 	}
 }
 
-type ErrStruct struct {
-	field1 int
-	field2 error
-}
-
 func errInStruct() ErrStruct {
 	_, err := returns2Values()
 
 	e := ErrStruct{field1: 0, field2: err}
 
 	return e
-}
-
-func SingleErrReturn() error {
-	return nil
 }
 
 func singleErr() {
