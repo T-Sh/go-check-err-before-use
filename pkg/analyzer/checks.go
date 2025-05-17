@@ -73,6 +73,10 @@ func isIfWithErr(node ast.Node) bool {
 		return false
 	}
 
+	if isExpContainsErr(ifStmt.Cond) {
+		return true
+	}
+
 	if binExpr, ok := ifStmt.Cond.(*ast.BinaryExpr); ok {
 		if isExpContainsErr(binExpr.X) {
 			return true
@@ -91,8 +95,10 @@ func isIfWithErr(node ast.Node) bool {
 		}
 	}
 
-	if isExpContainsErr(ifStmt.Cond) {
-		return true
+	for _, stmt := range ifStmt.Body.List {
+		if allChecks(stmt) {
+			return true
+		}
 	}
 
 	return false

@@ -137,3 +137,17 @@ func withSwitchInsideCase(state int) (int, error) {
 	}
 	return 0, nil
 }
+
+func withIfInside(state int) (int, error) {
+	_, err := os.OpenFile("test", 0, os.ModePerm)
+
+	if state == 0 {
+		print()
+		return state, err
+	}
+
+	if err != nil {
+		return -2, err
+	}
+	return 0, nil
+}
