@@ -42,7 +42,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 				nextStmt := blockStmt.List[nextStmtPos]
 
-				if isIfWithErr(nextStmt) || isCallWithErr(nextStmt) || isSwitch(nextStmt) || isAssignWithErrUse(nextStmt) {
+				if isIfWithErr(nextStmt) || isCallWithErr(nextStmt) || isSwitch(nextStmt) || isAssignWithErrUse(nextStmt) || isReturnWithErr(nextStmt) {
 					return
 				}
 

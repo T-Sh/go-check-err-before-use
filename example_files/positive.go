@@ -116,3 +116,9 @@ func errWithOk() {
 
 	panic(err.Error())
 }
+
+func errWithReturn() error {
+	_, err := returns2Values()
+
+	return err
+}

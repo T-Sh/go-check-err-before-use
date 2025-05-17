@@ -196,3 +196,15 @@ func isAssignWithErrUse(node ast.Node) bool {
 
 	return false
 }
+
+func isReturnWithErr(node ast.Node) bool {
+	if returnStmt, ok := node.(*ast.ReturnStmt); ok {
+		for _, result := range returnStmt.Results {
+			if isExpContainsErr(result) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
