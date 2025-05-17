@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log/syslog"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -121,4 +122,18 @@ func errWithReturn() error {
 	_, err := returns2Values()
 
 	return err
+}
+
+func withSwitchInsideCase(state int) (int, error) {
+	_, err := os.OpenFile("test", 0, os.ModePerm)
+
+	switch state {
+	case 3:
+		return -1, err
+	}
+
+	if err != nil {
+		return -2, err
+	}
+	return 0, nil
 }

@@ -11,6 +11,10 @@ func checkValueNameWithErr(name string) bool {
 	return name == errPrefix || name == okPrefix
 }
 
+func allChecks(nextStmt ast.Node) bool {
+	return isIfWithErr(nextStmt) || isCallWithErr(nextStmt) || isReturnWithErr(nextStmt) || isSwitchWithErr(nextStmt) || isAssignWithErrUse(nextStmt)
+}
+
 // Checks that assigment contains err in return values.
 // Example: v, err := someFunc()
 // Skips single err return.
@@ -145,9 +149,9 @@ func isCallWithErr(node ast.Node) bool {
 // Checks that switch uses err variable.
 // Example: switch err {...
 // Example: switch { err != nil {...
-func isSwitch(node ast.Node) bool {
+func isSwitchWithErr(node ast.Node) bool {
 	if switchStmt, ok := node.(*ast.SwitchStmt); ok {
-		return isSwitchWithTag(switchStmt) || isSwitchWithBody(switchStmt)
+		return isSwitchWithTag(switchStmt) || isSwitchWithCase(switchStmt)
 	}
 
 	return false
@@ -167,12 +171,28 @@ func isSwitchWithTag(switchStmt *ast.SwitchStmt) bool {
 
 // Checks that switch uses err variable in body.
 // Example: switch { err != nil {...
-func isSwitchWithBody(switchStmt *ast.SwitchStmt) bool {
+func isSwitchWithCase(switchStmt *ast.SwitchStmt) bool {
 	for _, caseClauseStmt := range switchStmt.Body.List {
 		if caseClause, ok := caseClauseStmt.(*ast.CaseClause); ok {
 			for _, expr := range caseClause.List {
-				return isIfWithErr(expr) || isExpContainsErr(expr)
+				if allChecks(expr) || isExpContainsErr(expr) {
+					return true
+				}
 			}
+
+			if isCaseWithBody(caseClause) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func isCaseWithBody(caseStmt *ast.CaseClause) bool {
+	for _, stmt := range caseStmt.Body {
+		if allChecks(stmt) {
+			return true
 		}
 	}
 
