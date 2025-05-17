@@ -12,18 +12,27 @@ const (
 	linterName          = "gocheckerrbeforeuse"
 	linterDoc           = "Checks that err is checked before struct use."
 	linterReturnMessage = "error must be checked right after receiving"
+	defaultDistance     = 1
 )
 
-func NewAnalyzer(settings *Settings) *analysis.Analyzer {
+func NewAnalyzer(settings Settings) *analysis.Analyzer {
+	if settings.Distance < 1 {
+		settings.Distance = defaultDistance
+	}
+
 	return &analysis.Analyzer{
-		Name:     linterName,
-		Doc:      linterDoc,
-		Run:      run,
+		Name: linterName,
+		Doc:  linterDoc,
+		Run: func(pass *analysis.Pass) (any, error) {
+			run(pass, settings.Distance)
+
+			return nil, nil //nolint:nilnil
+		},
 		Requires: []*analysis.Analyzer{inspect.Analyzer},
 	}
 }
 
-func run(pass *analysis.Pass) (interface{}, error) {
+func run(pass *analysis.Pass, distance int) {
 	orderedInspector := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 
 	nodeFilter := []ast.Node{
@@ -35,15 +44,17 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 		for pos, stmt := range blockStmt.List {
 			if isAssignWithErr(stmt) || isDeclWithErr(stmt) {
-				nextStmtPos := pos + 1
-				if nextStmtPos >= len(blockStmt.List) {
-					return
-				}
+				for idx := 1; idx <= distance; idx++ {
+					nextStmtPos := pos + idx
+					if nextStmtPos >= len(blockStmt.List) {
+						return
+					}
 
-				nextStmt := blockStmt.List[nextStmtPos]
+					nextStmt := blockStmt.List[nextStmtPos]
 
-				if allChecks(nextStmt) {
-					return
+					if allChecks(nextStmt) {
+						return
+					}
 				}
 
 				pass.Reportf(stmt.Pos(), linterReturnMessage)
@@ -51,6 +62,4 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		}
 	},
 	)
-
-	return nil, nil //nolint:nilnil
 }
