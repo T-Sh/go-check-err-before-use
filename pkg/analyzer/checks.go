@@ -33,6 +33,26 @@ func isAssignWithErr(node ast.Node) bool {
 	return false
 }
 
+func isDeclWithErr(node ast.Node) bool {
+	if declStmt, ok := node.(*ast.DeclStmt); ok {
+		if genDecl, ok := declStmt.Decl.(*ast.GenDecl); ok {
+			if genDecl.Tok.String() == "var" {
+				for _, spec := range genDecl.Specs {
+					if valueSpec, ok := spec.(*ast.ValueSpec); ok {
+						for _, name := range valueSpec.Names {
+							if isExpContainsErr(name) {
+								return true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return false
+}
+
 // Checks that if statement contains err check inside.
 // Example: if err != nil ...
 // Example: if IsError(err) ...

@@ -34,7 +34,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		blockStmt := node.(*ast.BlockStmt)
 
 		for pos, stmt := range blockStmt.List {
-			if isAssignWithErr(stmt) {
+			if isAssignWithErr(stmt) || isDeclWithErr(stmt) {
 				nextStmtPos := pos + 1
 				if nextStmtPos >= len(blockStmt.List) {
 					return
