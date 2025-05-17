@@ -33,10 +33,17 @@ func isAssignWithErr(node ast.Node) bool {
 	return false
 }
 
+// Checks that assigment contains err in return values with var.
+// Example: var v, err = someFunc()
+// Skips single err return.
+// Example for skip:  var err = someFunc()
 func isDeclWithErr(node ast.Node) bool {
 	if declStmt, ok := node.(*ast.DeclStmt); ok {
 		if genDecl, ok := declStmt.Decl.(*ast.GenDecl); ok {
 			if genDecl.Tok.String() == "var" {
+				if len(genDecl.Specs) == 1 {
+					return false
+				}
 				for _, spec := range genDecl.Specs {
 					if valueSpec, ok := spec.(*ast.ValueSpec); ok {
 						for _, name := range valueSpec.Names {
@@ -197,6 +204,8 @@ func isAssignWithErrUse(node ast.Node) bool {
 	return false
 }
 
+// Checks that return stmt contains err.
+// Example: return res, err
 func isReturnWithErr(node ast.Node) bool {
 	if returnStmt, ok := node.(*ast.ReturnStmt); ok {
 		for _, result := range returnStmt.Results {
