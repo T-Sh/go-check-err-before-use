@@ -1,6 +1,9 @@
 package analyzer
 
-import "go/ast"
+import (
+	"go/ast"
+	"strings"
+)
 
 const (
 	errPrefix = "err"
@@ -8,7 +11,7 @@ const (
 )
 
 func checkValueNameWithErr(name string) bool {
-	return name == errPrefix || name == okPrefix
+	return strings.HasPrefix(name, errPrefix) || name == okPrefix
 }
 
 func allChecks(nextStmt ast.Node) bool {
