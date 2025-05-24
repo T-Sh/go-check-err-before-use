@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	var flagDistance = flag.Int("distance", 1, "The acceptable distance between the assignment of an error and its checking")
+	var flagDistance = flag.Int("distance", 1, "The acceptable maximum distance between the assignment of an error and its checking")
 	flag.Parse()
 
 	setting := analyzer.Settings{Distance: *flagDistance}
