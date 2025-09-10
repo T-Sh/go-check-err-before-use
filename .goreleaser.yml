@@ -1,0 +1,25 @@
+project_name: go-check-err-before-use
+builds:
+  - main: ./cmd/go-check-err-before-use/main.go
+    binary: gocheckerrbeforeuse
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - formats: [ 'tar.gz' ]
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: 'checksums.txt'
+
+release:
+  github:
+    owner: T-Sh
+    name: go-check-err-before-use
